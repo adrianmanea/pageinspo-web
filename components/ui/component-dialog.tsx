@@ -1,13 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { X, ExternalLink, User } from "lucide-react";
 import Link from "next/link";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { createClient } from "@/utils/supabase/client";
 
 interface ComponentDialogProps {
   isOpen: boolean;
@@ -20,7 +24,58 @@ export function ComponentDialog({
   onClose,
   component,
 }: ComponentDialogProps) {
+  const [variants, setVariants] = useState<any[]>([]);
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+
+  useEffect(() => {
+    if (isOpen && component) {
+      // Default variant from the component itself
+      const defaultVariant = {
+        id: "default-main",
+        name: "Default",
+        code_string: component.code_string,
+        preview_url: component.preview_url,
+        is_default: true,
+      };
+
+      const fetchVariants = async () => {
+        const supabase = createClient();
+
+        try {
+          const { data: varData } = await supabase
+            .from("component_variants")
+            .select("*")
+            .eq("component_id", component.id)
+            .order("is_default", { ascending: false })
+            .order("created_at", { ascending: true });
+
+          if (varData && varData.length > 0) {
+            setVariants([defaultVariant, ...varData]);
+          } else {
+            setVariants([defaultVariant]);
+          }
+        } catch (e) {
+          console.error("Error fetching variants:", e);
+          setVariants([defaultVariant]);
+        }
+      };
+
+      fetchVariants();
+
+      // Initialize selected variant to the constructed default variant
+      // This ensures the ID matches "default-main" used in the variants list/select options
+      setSelectedVariant(defaultVariant);
+    }
+  }, [isOpen, component]);
+
+  // When variants load, if we have them, we might want to ensure selectedVariant
+  // points to one of them if current selected is unrelated (e.g. from prev open).
+  // But purely relying on 'isOpen' reset above is safer.
+
   if (!component) return null;
+
+  // Use selectedVariant if available, falling back to component defaults
+  const currentUrl = selectedVariant?.preview_url || component.preview_url;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -44,6 +99,30 @@ export function ComponentDialog({
                 {component.original_app || "Unknown Source"}
               </span>
             </div>
+
+            {/* Variant Selector */}
+            {variants.length > 1 && (
+              <div className="ml-4">
+                <Select
+                  value={selectedVariant?.id || "default-main"}
+                  onValueChange={(val) => {
+                    const found = variants.find((v) => v.id === val);
+                    if (found) setSelectedVariant(found);
+                  }}
+                >
+                  <SelectTrigger className="h-7 w-[130px] text-xs px-2 border-border/60 bg-muted/20">
+                    <SelectValue placeholder="Select variant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {variants.map((v) => (
+                      <SelectItem key={v.id} value={v.id} className="text-xs">
+                        {v.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -71,10 +150,8 @@ export function ComponentDialog({
         <div className="flex-1 bg-background relative overflow-hidden">
           <iframe
             src={
-              component.preview_url
-                ? `/api/preview-proxy?url=${encodeURIComponent(
-                    component.preview_url
-                  )}`
+              currentUrl
+                ? `/api/preview-proxy?url=${encodeURIComponent(currentUrl)}`
                 : `/component/${component.id}/preview`
             }
             className="w-full h-full border-0"

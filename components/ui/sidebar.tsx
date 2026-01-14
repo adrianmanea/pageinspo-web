@@ -16,6 +16,7 @@ import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginDialog } from "@/components/auth/login-dialog";
+import Image from "next/image";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -79,23 +80,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
     fetchData();
   }, []);
 
-  const toggleFilter = (id: string) => {
-    // Single Select Logic:
-    // If clicked filter is already active -> clear it (return to Home)
-    // If different filter -> replace it
-    const isCurrentlyActive = activeFilterIds.includes(id);
-
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (isCurrentlyActive) {
-      params.delete("filters");
-    } else {
-      // Replace entire filters param with just this ID
-      params.set("filters", id);
-    }
-
-    router.push(`/?${params.toString()}`);
-  };
+  // toggleFilter removed in favor of Link
 
   const toggleSection = (section: string) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -123,15 +108,13 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       )}
       {...props}
     >
-      <div className="flex h-14 items-center px-4 py-3">
+      <div className="flex h-14 items-center px-4 mt-2">
         <Link href="/">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground font-bold text-[10px]">
-            UF
-          </div>
+          <Logo />
         </Link>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-2 scrollbar-none">
+      <div className="flex-1 overflow-y-auto py-4 px-4 space-y-2 scrollbar-none">
         {/* Main Nav */}
         <div className="space-y-0.5">
           <NavItem
@@ -236,27 +219,30 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                                   <Button
                                     key={filter.id}
                                     variant="ghost"
-                                    onClick={() => toggleFilter(filter.id)}
+                                    asChild
                                     className={cn(
                                       "w-full flex items-center justify-between px-2 py-1 h-auto font-normal hover:bg-sidebar-accent hover:text-foreground cursor-pointer",
-                                      isActive
+                                      pathname === `/components/${filter.slug}`
                                         ? "text-sidebar-primary font-medium bg-sidebar-accent"
                                         : "text-muted-foreground"
                                     )}
                                   >
-                                    <span className="truncate text-[13px]">
-                                      {filter.name}
-                                    </span>
-                                    <span
-                                      className={cn(
-                                        "text-[10px] tabular-nums transition-colors",
-                                        isActive
-                                          ? "text-primary"
-                                          : "text-muted-foreground group-hover:text-foreground"
-                                      )}
-                                    >
-                                      {count}
-                                    </span>
+                                    <Link href={`/components/${filter.slug}`}>
+                                      <span className="truncate text-[13px]">
+                                        {filter.name}
+                                      </span>
+                                      <span
+                                        className={cn(
+                                          "text-[10px] tabular-nums transition-colors",
+                                          pathname ===
+                                            `/components/${filter.slug}`
+                                            ? "text-primary"
+                                            : "text-muted-foreground group-hover:text-foreground"
+                                        )}
+                                      >
+                                        {count}
+                                      </span>
+                                    </Link>
                                   </Button>
                                 );
                               })}
@@ -316,4 +302,8 @@ function NavItem({ href, icon: Icon, label, active }: NavItemProps) {
       </Link>
     </Button>
   );
+}
+
+function Logo() {
+  return <Image src="/logo.svg" alt="Logo" width={116} height={24} />;
 }

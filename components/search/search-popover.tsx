@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Kbd } from "@/components/ui/kbd";
 import { cn } from "@/utils/cn";
 
 interface SearchPopoverProps {
@@ -95,9 +96,9 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
     return items;
   }, [filters, activeTab, searchQuery]);
 
-  const handleSelect = (id: string) => {
-    // Navigate to homepage with this filter
-    router.push(`/?filters=${id}`);
+  const handleSelect = (slug: string) => {
+    // Navigate to category page
+    router.push(`/components/${slug}`);
     onOpenChange(false);
   };
 
@@ -126,16 +127,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
               )}
             </div>
             <div className="hidden md:flex items-center gap-2 text-muted-foreground">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onOpenChange(false)}
-              >
-                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                  ESC
-                </kbd>
-              </Button>
+              <Kbd>ESC</Kbd>
               <Button
                 variant="ghost"
                 size="icon"
@@ -159,7 +151,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left",
                   activeTab === tab.value
-                    ? "bg-background shadow-sm text-foreground"
+                    ? "bg-muted text-foreground"
                     : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                 )}
               >
@@ -198,7 +190,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                       filteredItems.map((filter) => (
                         <button
                           key={filter.id}
-                          onClick={() => handleSelect(filter.id)}
+                          onClick={() => handleSelect(filter.slug)}
                           className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 group transition-colors text-left"
                         >
                           <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground">

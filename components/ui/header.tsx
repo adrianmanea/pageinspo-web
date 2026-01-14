@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { SearchPopover } from "@/components/search/search-popover";
+import { getGradient } from "@/utils/get-gradient";
+import { Avatar } from "@/components/ui/avatar";
 
 interface HeaderProps {
   className?: string;
@@ -136,9 +137,14 @@ export function Header({ className, breadcrumbs }: HeaderProps) {
               <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Sign Out</span>
             </Button>
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-500/20 to-purple-500/20 ring-1 ring-border flex items-center justify-center text-xs font-medium text-foreground">
-              {user.email?.[0].toUpperCase()}
-            </div>
+            <Avatar className="h-8 w-8 border border-border">
+              <div
+                className="h-full w-full flex items-center justify-center text-white text-[10px] font-bold"
+                style={{ backgroundImage: getGradient(user.email || "User") }}
+              >
+                {user.email?.[0].toUpperCase()}
+              </div>
+            </Avatar>
           </div>
         ) : (
           <Button

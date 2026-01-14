@@ -40,7 +40,16 @@ export default async function ComponentPage({
       if (compData) {
         component = compData;
 
-        // Fetch variants
+        // Create the default variant from the main component
+        const defaultVariant = {
+          id: "default-main",
+          name: "Default",
+          code_string: component.code_string,
+          preview_url: component.preview_url,
+          is_default: true,
+        };
+
+        // Fetch additional variants
         const { data: varData } = await supabase
           .from("component_variants")
           .select("*")
@@ -48,19 +57,12 @@ export default async function ComponentPage({
           .order("is_default", { ascending: false }) // Default first
           .order("created_at", { ascending: true });
 
+        // Combine default + additional variants
         if (varData && varData.length > 0) {
-          variants = varData;
+          variants = [defaultVariant, ...varData];
         } else {
-          // Implicit default variant from the main component data
-          variants = [
-            {
-              id: "default-legacy",
-              name: "Default",
-              code_string: component.code_string,
-              preview_url: component.preview_url,
-              is_default: true,
-            },
-          ];
+          // Just the default variant
+          variants = [defaultVariant];
         }
       }
     }
