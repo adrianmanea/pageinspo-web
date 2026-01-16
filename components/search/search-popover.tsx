@@ -118,7 +118,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Web Apps, Screens, UI Elements, Flows or Keywords..."
-                className="flex-1 bg-transparent border-0 h-full p-0 text-xl placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none"
+                className="flex-1 bg-transparent dark:bg-transparent border-0 h-full p-0 text-xl placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none"
               />
               {searchQuery && (
                 <button onClick={() => setSearchQuery("")}>
