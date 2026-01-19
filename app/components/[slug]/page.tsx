@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { Header } from "@/components/ui/header";
-import { ComponentGrid } from "@/components/dashboard/component-grid";
+import { ComponentGrid } from "@/components/web/component-grid";
 import { Sidebar } from "@/components/ui/sidebar";
 import { notFound } from "next/navigation";
 

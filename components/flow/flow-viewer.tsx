@@ -2,9 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Smartphone, Monitor } from "lucide-react";
-import { PreviewFrame } from "../renderer/PreviewFrame";
-import { DeviceMockup } from "../renderer/DeviceMockup";
-import { FlowControls } from "./FlowControls";
+import { PreviewFrame } from "../renderer/preview-frame";
+import { DeviceMockup } from "../renderer/device-mockup";
+import { FlowControls } from "./flow-controls";
 
 interface Step {
   component?: {

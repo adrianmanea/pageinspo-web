@@ -15,7 +15,7 @@ import {
 import { Avatar } from "@/components/ui/avatar";
 import { getGradient } from "@/utils/get-gradient";
 import { cn } from "@/utils/cn";
-import { PreviewFrame } from "@/components/renderer/PreviewFrame";
+import { PreviewFrame } from "@/components/renderer/preview-frame";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -32,12 +32,12 @@ interface PreviewClientProps {
 
 export function PreviewClient({ component, variants }: PreviewClientProps) {
   const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">(
-    "desktop"
+    "desktop",
   );
 
   // Default to the first variant if available
   const [selectedVariant, setSelectedVariant] = useState(
-    variants[0] || component
+    variants[0] || component,
   );
 
   // Fallback for code/url
@@ -70,7 +70,7 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
                       className="h-full w-full flex items-center justify-center text-white text-[9px] font-bold"
                       style={{
                         backgroundImage: getGradient(
-                          component.sources.name || component.name
+                          component.sources.name || component.name,
                         ),
                       }}
                     >
@@ -118,7 +118,7 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
                 "p-1.5 rounded-md transition-all",
                 device === "desktop"
                   ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
               )}
               title="Desktop"
             >
@@ -130,7 +130,7 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
                 "p-1.5 rounded-md transition-all",
                 device === "tablet"
                   ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
               )}
               title="Tablet (768px)"
             >
@@ -142,7 +142,7 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
                 "p-1.5 rounded-md transition-all",
                 device === "mobile"
                   ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
               )}
               title="Mobile (375px)"
             >
@@ -192,7 +192,7 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
               ? "w-full h-full rounded-none border-0"
               : "shadow-2xl border border-border",
             device === "tablet" && "w-[768px] h-[90%]",
-            device === "mobile" && "w-[375px] h-[85%] rounded-[2rem]"
+            device === "mobile" && "w-[375px] h-[85%] rounded-[2rem]",
           )}
         >
           <PreviewFrame
@@ -202,7 +202,8 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
                 ? `/api/preview-proxy?url=${encodeURIComponent(currentUrl)}`
                 : null
             }
-            theme="light" // Default to light or make it selectable in future
+            theme="light"
+            componentId={component.id}
           />
         </div>
       </main>

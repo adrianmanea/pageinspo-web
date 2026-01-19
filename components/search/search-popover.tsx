@@ -89,7 +89,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
     // 2. Filter by Search Query
     if (searchQuery) {
       items = items.filter((f) =>
-        f.name.toLowerCase().includes(searchQuery.toLowerCase())
+        f.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -113,7 +113,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
         <div className="flex flex-col border-b border-border/40">
           <div className="flex items-center gap-4 px-4 py-4">
             <div className="flex-1 flex items-center gap-3 bg-transparent rounded-full pr-4 h-12 border-none transition-all">
-              <Search className="h-6 w-6 text-muted-foreground" />
+              <Search className="h-4 w-4 text-muted-foreground" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -131,7 +131,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                className="h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
                 onClick={() => onOpenChange(false)}
               >
                 <X className="h-5 w-5" />
@@ -149,10 +149,10 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left cursor-pointer",
                   activeTab === tab.value
                     ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                 )}
               >
                 <tab.icon
@@ -160,7 +160,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                     "h-4 w-4 stroke-[1.5]",
                     activeTab === tab.value
                       ? "text-primary"
-                      : "text-muted-foreground"
+                      : "text-muted-foreground",
                   )}
                 />
                 {tab.label}
@@ -191,7 +191,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                         <button
                           key={filter.id}
                           onClick={() => handleSelect(filter.slug)}
-                          className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 group transition-colors text-left"
+                          className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 group transition-colors text-left cursor-pointer"
                         >
                           <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground">
                             {filter.name}
@@ -203,7 +203,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                       ))
                     ) : (
                       <div className="p-8 text-center text-sm text-muted-foreground flex flex-col items-center">
-                        <Search className="h-8 w-8 mb-3 opacity-20" />
+                        <Search className="h-4 w-4 mb-3 text-muted-foreground" />
                         <span>
                           No results found for "{searchQuery}" in{" "}
                           {

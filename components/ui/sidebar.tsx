@@ -116,7 +116,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
     <aside
       className={cn(
         "hidden w-[260px] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex shrink-0 h-screen overflow-y-auto scrollbar-none",
-        className
+        className,
       )}
       {...props}
     >
@@ -185,7 +185,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                   onClick={() => toggleSection(section)}
                   className={cn(
                     "w-full flex items-center justify-between px-2 py-1 h-auto hover:bg-sidebar-accent hover:text-foreground cursor-pointer",
-                    isOpen ? "text-foreground" : "text-muted-foreground"
+                    isOpen ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   <div className="flex items-center gap-2">
@@ -197,7 +197,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                   <ChevronRight
                     className={cn(
                       "h-4 w-4 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
-                      isOpen && "rotate-90"
+                      isOpen && "rotate-90",
                     )}
                   />
                 </Button>
@@ -224,7 +224,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                               {grouped[groupName].map((filter) => {
                                 const count = counts[filter.id] || 0;
                                 const isActive = activeFilterIds.includes(
-                                  filter.id
+                                  filter.id,
                                 );
 
                                 return (
@@ -236,7 +236,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                                       "w-full flex items-center justify-between px-2 py-1 h-auto font-normal hover:bg-sidebar-accent hover:text-foreground cursor-pointer",
                                       pathname === `/components/${filter.slug}`
                                         ? "text-sidebar-primary font-medium bg-sidebar-accent"
-                                        : "text-muted-foreground"
+                                        : "text-muted-foreground",
                                     )}
                                   >
                                     <Link href={`/components/${filter.slug}`}>
@@ -249,7 +249,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                                           pathname ===
                                             `/components/${filter.slug}`
                                             ? "text-primary"
-                                            : "text-muted-foreground group-hover:text-foreground"
+                                            : "text-muted-foreground group-hover:text-foreground",
                                         )}
                                       >
                                         {count}
@@ -284,7 +284,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                   "p-1.5 rounded-md transition-all",
                   theme === "light"
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent"
+                    : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent",
                 )}
                 title="Light"
               >
@@ -296,7 +296,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                   "p-1.5 rounded-md transition-all",
                   theme === "dark"
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent"
+                    : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent",
                 )}
                 title="Dark"
               >
@@ -308,7 +308,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                   "p-1.5 rounded-md transition-all",
                   theme === "system"
                     ? "bg-background text-foreground shadow-sm ring-1 ring-border/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent"
+                    : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent",
                 )}
                 title="System"
               >
@@ -341,7 +341,7 @@ function NavItem({ href, icon: Icon, label, active }: NavItemProps) {
         "w-full justify-start gap-2 px-3",
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
-          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
       )}
     >
       <Link href={href}>
@@ -353,5 +353,24 @@ function NavItem({ href, icon: Icon, label, active }: NavItemProps) {
 }
 
 function Logo() {
-  return <Image src="/logo.svg" alt="Logo" width={116} height={24} />;
+  return (
+    <>
+      {/* Light mode logo (hidden in dark mode) */}
+      <Image
+        src="/logo.svg"
+        alt="Logo"
+        width={116}
+        height={24}
+        className="dark:hidden"
+      />
+      {/* Dark mode logo (hidden in light mode) */}
+      <Image
+        src="/logo-dark.svg"
+        alt="Logo"
+        width={116}
+        height={24}
+        className="hidden dark:block"
+      />
+    </>
+  );
 }

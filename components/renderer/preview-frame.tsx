@@ -1,18 +1,22 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { incrementViewCount } from "@/utils/actions";
 
 interface PreviewFrameProps {
   code?: string;
   theme?: "light" | "dark";
   previewUrl?: string | null;
+  componentId?: number;
 }
 
 export function PreviewFrame({
   code,
   theme = "light",
   previewUrl,
+  componentId,
 }: PreviewFrameProps) {
   const iframeRef = useRef(null);
+  const hasTrackedView = useRef(false);
 
   // Fallback to runtime sandbox logic (only runs if no previewUrl)
   useEffect(() => {
@@ -26,12 +30,12 @@ export function PreviewFrame({
       // Send theme
       iframe.contentWindow?.postMessage(
         { type: "THEME_CHANGE", payload: theme },
-        "*"
+        "*",
       );
       // Send code
       iframe.contentWindow?.postMessage(
         { type: "RENDER_CODE", payload: code },
-        "*"
+        "*",
       );
     };
 
@@ -49,7 +53,7 @@ export function PreviewFrame({
     if (iframe && iframe.contentDocument?.readyState === "complete") {
       iframe.contentWindow?.postMessage(
         { type: "RENDER_CODE", payload: code },
-        "*"
+        "*",
       );
     }
   }, [code, previewUrl]);
@@ -61,13 +65,20 @@ export function PreviewFrame({
     if (iframe && iframe.contentDocument?.readyState === "complete") {
       iframe.contentWindow?.postMessage(
         { type: "THEME_CHANGE", payload: theme },
-        "*"
+        "*",
       );
     }
   }, [theme, previewUrl]);
 
   // If a static preview URL is provided, just use that.
   if (previewUrl) {
+    const handleIframeLoad = () => {
+      if (componentId && !hasTrackedView.current) {
+        hasTrackedView.current = true;
+        incrementViewCount(componentId).catch(console.error);
+      }
+    };
+
     return (
       <div className="w-full h-full bg-transparent rounded-lg shadow-sm overflow-hidden border border-gray-200/0">
         <iframe
@@ -75,6 +86,7 @@ export function PreviewFrame({
           className="w-full h-full border-0"
           title="Component Preview"
           sandbox="allow-scripts"
+          onLoad={handleIframeLoad}
         />
       </div>
     );

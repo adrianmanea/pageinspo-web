@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ComponentGrid } from "@/components/dashboard/component-grid";
+import { ComponentGrid } from "@/components/web/component-grid";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { getExploreComponents } from "@/actions/explore";

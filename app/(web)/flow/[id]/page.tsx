@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import FlowViewer from "@/components/flow/FlowViewer";
+import FlowViewer from "@/components/flow/flow-viewer";
 
 // Mock Data duplicate for Server Component Fallback
 // (In a real app, strict shared lib or DB access only)

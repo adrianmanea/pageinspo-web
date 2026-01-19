@@ -3,7 +3,7 @@
 import { getGradient } from "@/utils/get-gradient";
 import { cn } from "@/utils/cn";
 import { Avatar } from "@/components/ui/avatar";
-import { Component } from "lucide-react";
+import { Component, Eye } from "lucide-react";
 import Link from "next/link";
 
 interface ComponentCardProps {
@@ -13,6 +13,7 @@ interface ComponentCardProps {
     description?: string;
     thumbnail_url?: string;
     original_app?: string;
+    view_count?: number;
     [key: string]: any;
   };
   className?: string;
@@ -26,13 +27,11 @@ export function ComponentCard({
   onClick,
   href,
 }: ComponentCardProps) {
-  // Dummy avatar data
-
   return (
     <div
       className={cn(
-        "group cursor-pointer flex flex-col gap-3 relative",
-        className
+        "bg-muted rounded-xl p-4 group cursor-pointer flex flex-col gap-3 relative",
+        className,
       )}
       onClick={onClick}
     >
@@ -49,7 +48,7 @@ export function ComponentCard({
                 className="h-full w-full flex items-center justify-center text-white text-[10px] font-bold"
                 style={{
                   backgroundImage: getGradient(
-                    item.sources?.name || item.name || "Component"
+                    item.sources?.name || item.name || "Component",
                   ),
                 }}
               >
@@ -67,7 +66,7 @@ export function ComponentCard({
               className="h-full w-full flex items-center justify-center text-white text-[10px] font-bold"
               style={{
                 backgroundImage: getGradient(
-                  item.sources?.name || item.name || "Component"
+                  item.sources?.name || item.name || "Component",
                 ),
               }}
             >
@@ -92,8 +91,16 @@ export function ComponentCard({
               </Link>
             ) : (
               item.sources?.name || item.original_app || "Pro Concept"
-            )}{" "}
-            <span className="text-muted-foreground/40">•</span> Default
+            )}
+            {/* View count hidden for now - tracking still active
+            {typeof item.view_count === "number" && (
+              <>
+                <span className="text-muted-foreground/40">•</span>
+                <Eye className="h-3 w-3" />
+                <span>{item.view_count.toLocaleString()}</span>
+              </>
+            )}
+            */}
           </span>
         </div>
       </div>

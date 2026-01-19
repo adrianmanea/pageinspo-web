@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { LayoutGrid } from "lucide-react";
 import { ComponentDialog } from "@/components/ui/component-dialog";
-import { ComponentCard } from "@/components/dashboard/component-card";
+import { ComponentCard } from "@/components/web/component-card";
 
 export function ComponentGrid({
   items,

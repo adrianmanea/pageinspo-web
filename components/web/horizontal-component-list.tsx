@@ -43,7 +43,7 @@ export function HorizontalComponentList({
       </div>
 
       <div className="relative w-full overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-        <div className="flex gap-4 w-max">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => {
             const isFlow = "flow_steps" in item;
 
@@ -52,7 +52,6 @@ export function HorizontalComponentList({
                 <ComponentCard
                   key={item.id}
                   item={item}
-                  className="w-[320px]"
                   href={`/flow/${item.id}`}
                 />
               );
@@ -63,7 +62,6 @@ export function HorizontalComponentList({
                 key={item.id}
                 item={item}
                 onClick={() => setSelectedComponent(item)}
-                className="w-[320px]"
               />
             );
           })}
