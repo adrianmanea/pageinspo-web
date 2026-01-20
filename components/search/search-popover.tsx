@@ -104,7 +104,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl w-full h-[85vh] max-h-[720px] p-0 gap-0 overflow-hidden bg-background/90 backdrop-blur-xl border-border shadow-2xl rounded-3xl flex flex-col [&>button]:hidden">
+      <DialogContent className="sm:max-w-4xl w-full h-[85vh] max-h-[720px] p-0 gap-0 overflow-hidden border-border shadow-2xl rounded-3xl flex flex-col [&>button]:hidden">
         <DialogTitle className="sr-only">Search</DialogTitle>
         <DialogDescription className="sr-only">
           Search for components, screens, flows and more.
@@ -121,7 +121,10 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                 className="flex-1 bg-transparent dark:bg-transparent border-0 h-full p-0 text-xl placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none"
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery("")}>
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="cursor-pointer"
+                >
                   <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
                 </button>
               )}
@@ -152,7 +155,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left cursor-pointer",
                   activeTab === tab.value
                     ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
                 )}
               >
                 <tab.icon
@@ -180,7 +183,7 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className="h-10 w-full bg-muted/40 rounded-xl animate-pulse"
+                        className="h-10 w-full bg-muted rounded-xl animate-pulse"
                       />
                     ))}
                   </div>
@@ -191,12 +194,12 @@ export function SearchPopover({ open, onOpenChange }: SearchPopoverProps) {
                         <button
                           key={filter.id}
                           onClick={() => handleSelect(filter.slug)}
-                          className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 group transition-colors text-left cursor-pointer"
+                          className="flex items-center justify-between p-3 rounded-xl hover:bg-accent group transition-colors text-left cursor-pointer"
                         >
                           <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground">
                             {filter.name}
                           </span>
-                          <span className="text-xs text-muted-foreground group-hover:text-foreground/70 bg-muted/50 px-2 py-0.5 rounded-md group-hover:bg-muted">
+                          <span className="text-xs text-muted-foreground group-hover:text-foreground/70 bg-muted/50 px-2 py-0.5 rounded-md group-hover:bg-accent">
                             {counts[filter.id] || 0}
                           </span>
                         </button>

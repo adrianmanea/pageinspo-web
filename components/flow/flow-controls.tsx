@@ -15,7 +15,7 @@ export function FlowControls({
   onPrev,
 }: FlowControlsProps) {
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/90 backdrop-blur border border-gray-200 p-2 rounded-full shadow-lg">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/90 border border-gray-200 p-2 rounded-full shadow-lg">
       <button
         onClick={onPrev}
         disabled={currentStep === 0}

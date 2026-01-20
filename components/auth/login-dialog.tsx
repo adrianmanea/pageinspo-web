@@ -150,7 +150,7 @@ export function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
                 setIsSignUp(!isSignUp);
                 setMessage(null);
               }}
-              className="text-foreground font-medium hover:text-foreground/80 underline-offset-4 hover:underline transition-colors focus:outline-none"
+              className="text-foreground font-medium hover:text-foreground/80 underline-offset-4 hover:underline transition-colors focus:outline-none cursor-pointer"
             >
               {isSignUp ? "Sign In" : "Sign Up"}
             </button>

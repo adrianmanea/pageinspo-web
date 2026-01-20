@@ -43,10 +43,11 @@ export function ComponentEditDialog({
   const [selectedFilters, setSelectedFilters] =
     useState<string[]>(currentFilters);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [htmlFile, setHtmlFile] = useState<File | null>(null);
   const [sources, setSources] = useState<any[]>([]);
   const [selectedSourceId, setSelectedSourceId] = useState<string>(
-    component.source_id || ""
+    component.source_id || "",
   );
   const [isUploading, setIsUploading] = useState(false);
   const supabase = createClient();
@@ -59,11 +60,58 @@ export function ComponentEditDialog({
     fetchSources();
   }, []);
 
+  // Auto-generate OG image from MP4 thumbnail
+  useEffect(() => {
+    if (thumbnailFile && thumbnailFile.type.startsWith("video/")) {
+      const generateOg = async () => {
+        try {
+          const video = document.createElement("video");
+          video.src = URL.createObjectURL(thumbnailFile);
+          video.muted = true;
+          video.play(); // Required for some browsers to load frames
+          video.pause();
+
+          video.onloadeddata = () => {
+            video.currentTime = 0.5; // Capture at 0.5s
+          };
+
+          video.onseeked = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob(
+                (blob) => {
+                  if (blob) {
+                    const file = new File([blob], "og-generated.jpg", {
+                      type: "image/jpeg",
+                    });
+                    setOgImageFile(file);
+                  }
+                  // Cleanup
+                  URL.revokeObjectURL(video.src);
+                },
+                "image/jpeg",
+                0.9,
+              );
+            }
+          };
+        } catch (e) {
+          console.error("Failed to generate OG image", e);
+        }
+      };
+      generateOg();
+    }
+  }, [thumbnailFile]);
+
   const handleSave = async () => {
     startTransition(async () => {
       try {
         let thumbnailUrl = component.thumbnail_url;
         let previewUrl = component.preview_url;
+        let ogImageUrl = component.og_image_url;
 
         // Upload new thumbnail if selected
         if (thumbnailFile) {
@@ -84,6 +132,24 @@ export function ComponentEditDialog({
             .getPublicUrl(fileName);
 
           thumbnailUrl = publicUrlData.publicUrl;
+        }
+
+        // Upload OG Image (either generated or manually selected)
+        if (ogImageFile) {
+          setIsUploading(true);
+          const fileName = `og/${component.id}-${Date.now()}.jpg`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("component-previews")
+            .upload(fileName, ogImageFile, { upsert: true });
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicUrlData } = supabase.storage
+            .from("component-previews")
+            .getPublicUrl(fileName);
+
+          ogImageUrl = publicUrlData.publicUrl;
         }
 
         // Upload new HTML file if selected
@@ -109,7 +175,7 @@ export function ComponentEditDialog({
         } else {
           // Check for external URL input
           const urlInput = document.getElementById(
-            "external-url-input"
+            "external-url-input",
           ) as HTMLInputElement;
           if (urlInput && urlInput.value) {
             previewUrl = urlInput.value;
@@ -122,6 +188,7 @@ export function ComponentEditDialog({
           description,
           thumbnail_url: thumbnailUrl,
           preview_url: previewUrl,
+          og_image_url: ogImageUrl,
           source_id:
             selectedSourceId && selectedSourceId !== "none"
               ? selectedSourceId
@@ -142,7 +209,7 @@ export function ComponentEditDialog({
             selectedFilters.map((fid) => ({
               component_id: component.id,
               filter_id: fid,
-            }))
+            })),
           );
         }
 
@@ -156,7 +223,7 @@ export function ComponentEditDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
@@ -195,7 +262,7 @@ export function ComponentEditDialog({
                 type="file"
                 accept="image/*,video/mp4"
                 onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-                className="bg-background border-input text-xs"
+                className="bg-background border-input text-xs cursor-pointer"
               />
               {(thumbnailFile || component.thumbnail_url) && (
                 <div className="relative h-10 w-16 flex-shrink-0 overflow-hidden rounded border border-border">
@@ -237,12 +304,42 @@ export function ComponentEditDialog({
           </div>
 
           <div className="grid gap-2">
+            <Label>OG Image (Social Share)</Label>
+            <div className="flex items-center gap-4">
+              <div className="flex-1 space-y-2">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setOgImageFile(e.target.files?.[0] || null)}
+                  className="bg-background border-input text-xs cursor-pointer"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Auto-generated for videos. Upload to override.
+                </p>
+              </div>
+              {(ogImageFile || component.og_image_url) && (
+                <div className="relative h-10 w-16 flex-shrink-0 overflow-hidden rounded border border-border">
+                  <img
+                    src={
+                      ogImageFile
+                        ? URL.createObjectURL(ogImageFile)
+                        : component.og_image_url
+                    }
+                    alt="OG Preview"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-2">
             <Label>Attribution Source</Label>
             <Select
               value={selectedSourceId}
               onValueChange={setSelectedSourceId}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full cursor-pointer">
                 <SelectValue placeholder="Select a source..." />
               </SelectTrigger>
               <SelectContent>
@@ -272,7 +369,7 @@ export function ComponentEditDialog({
                       setHtmlFile(e.target.files?.[0] || null);
                       // Clear URL input if file is selected
                       const urlInput = document.getElementById(
-                        "external-url-input"
+                        "external-url-input",
                       ) as HTMLInputElement;
                       if (urlInput) urlInput.value = "";
                     }}
@@ -311,7 +408,7 @@ export function ComponentEditDialog({
                       setHtmlFile(null); // Clear file if URL provided
                     }
                   }}
-                  className="bg-background border-input text-xs font-mono"
+                  className="bg-background border-input text-xs font-mono cursor-text"
                   id="external-url-input"
                 />
                 <p className="text-[10px] text-muted-foreground">

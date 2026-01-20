@@ -2,78 +2,108 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LayoutGrid } from "lucide-react";
+import { ChevronRight, FileText, Link as LinkIcon, Files } from "lucide-react";
 import { ComponentDialog } from "@/components/ui/component-dialog";
-import { ComponentCard } from "@/components/web/component-card";
+import { ComponentCard } from "./component-card";
 
 export function ComponentGrid({
   items,
-  title = "Latest",
-  description,
+  title = "Newest",
+  viewAllLink,
 }: {
   items: any[];
   title?: string;
-  description?: string;
+  viewAllLink?: string;
 }) {
   const [selectedComponent, setSelectedComponent] = useState<any>(null);
 
+  if (items.length === 0) {
+    return (
+      <div className="w-full space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            {title}
+          </h2>
+        </div>
+        <div className="flex w-full items-center justify-center">
+          <div className="bg-background border-border hover:border-border/80 text-center border-2 border-dashed rounded-xl p-14 w-full group hover:bg-muted/50 transition duration-500 hover:duration-200">
+            <div className="flex justify-center isolate">
+              <div className="bg-background size-12 grid place-items-center rounded-xl relative left-2.5 top-1.5 -rotate-6 shadow-lg ring-1 ring-border group-hover:-translate-x-5 group-hover:-rotate-12 group-hover:-translate-y-0.5 transition duration-500 group-hover:duration-200">
+                <FileText
+                  className="w-6 h-6 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="bg-background size-12 grid place-items-center rounded-xl relative z-10 shadow-lg ring-1 ring-border group-hover:-translate-y-0.5 transition duration-500 group-hover:duration-200">
+                <LinkIcon
+                  className="w-6 h-6 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="bg-background size-12 grid place-items-center rounded-xl relative right-2.5 top-1.5 rotate-6 shadow-lg ring-1 ring-border group-hover:translate-x-5 group-hover:rotate-12 group-hover:-translate-y-0.5 transition duration-500 group-hover:duration-200">
+                <Files
+                  className="w-6 h-6 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
+            <h2 className="text-foreground font-medium mt-6">
+              No Components Found
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1 whitespace-pre-line">
+              There are no components in this category yet.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className="w-full space-y-6">
       <ComponentDialog
         isOpen={!!selectedComponent}
         onClose={() => setSelectedComponent(null)}
         component={selectedComponent}
       />
 
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            {title}
-          </h1>
-          {description && (
-            <p className="text-muted-foreground mt-1 text-sm">{description}</p>
-          )}
-        </div>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">
+          {title}
+        </h2>
+        {viewAllLink && (
+          <Link
+            href={viewAllLink}
+            className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center transition-colors"
+          >
+            View all <ChevronRight className="ml-1 h-3 w-3" />
+          </Link>
+        )}
       </div>
 
-      {items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center bg-card/40">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/50 mb-4">
-            <LayoutGrid className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <h3 className="text-sm font-medium text-foreground mb-1">
-            No items found
-          </h3>
-          <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-            Try adjusting your search filters or check back later for new
-            components.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {items.map((item) => {
-            const isFlow = "flow_steps" in item;
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {items.map((item) => {
+          const isFlow = "flow_steps" in item;
 
-            if (isFlow) {
-              return (
-                <ComponentCard
-                  key={`flow-${item.id}`}
-                  item={item}
-                  href={`/flow/${item.id}`}
-                />
-              );
-            }
-
+          if (isFlow) {
             return (
               <ComponentCard
-                key={`comp-${item.id}`}
+                key={item.id}
                 item={item}
-                onClick={() => setSelectedComponent(item)}
+                href={`/flow/${item.id}`}
               />
             );
-          })}
-        </div>
-      )}
-    </>
+          }
+
+          return (
+            <ComponentCard
+              key={item.id}
+              item={item}
+              onClick={() => setSelectedComponent(item)}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 }

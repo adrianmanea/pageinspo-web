@@ -11,6 +11,7 @@ export async function updateComponent(
     code?: string;
     thumbnail_url?: string | null;
     preview_url?: string | null;
+    og_image_url?: string | null; // New field
     source_id?: string | null;
     original_app?: string | null;
   },

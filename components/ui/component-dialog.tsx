@@ -99,12 +99,14 @@ export function ComponentDialog({
                 }}
                 className="shrink-0"
               >
-                <Avatar className="h-8 w-8 border border-border hover:opacity-80 transition-opacity">
+                <Avatar className="h-8 w-8 border border-border hover:opacity-80 transition-opacity cursor-pointer">
                   <div
                     className="h-full w-full flex items-center justify-center text-white text-[10px] font-bold"
                     style={{
                       backgroundImage: getGradient(
-                        component.sources?.name || component.name || "Component"
+                        component.sources?.name ||
+                          component.name ||
+                          "Component",
                       ),
                     }}
                   >
@@ -122,7 +124,7 @@ export function ComponentDialog({
                   className="h-full w-full flex items-center justify-center text-white text-[10px] font-bold"
                   style={{
                     backgroundImage: getGradient(
-                      component.sources?.name || component.name || "Component"
+                      component.sources?.name || component.name || "Component",
                     ),
                   }}
                 >
@@ -146,7 +148,7 @@ export function ComponentDialog({
                     e.stopPropagation();
                     onClose();
                   }}
-                  className="text-xs text-muted-foreground truncate hover:text-foreground hover:underline transition-colors w-fit"
+                  className="text-xs text-muted-foreground truncate hover:text-foreground hover:underline transition-colors w-fit cursor-pointer"
                 >
                   {component.sources.name}
                 </Link>
@@ -167,7 +169,7 @@ export function ComponentDialog({
                     if (found) setSelectedVariant(found);
                   }}
                 >
-                  <SelectTrigger className="h-7 w-[130px] text-xs px-2 border-border/60 bg-muted/20">
+                  <SelectTrigger className="h-7 w-[130px] text-xs px-2 border-border/60 bg-muted/20 cursor-pointer">
                     <SelectValue placeholder="Select variant" />
                   </SelectTrigger>
                   <SelectContent>
@@ -186,7 +188,7 @@ export function ComponentDialog({
             <Link
               href={`/component/${component.id}`}
               target="_blank"
-              className="inline-flex items-center justify-center h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
               title="Open in new tab"
             >
               <ExternalLink className="h-4 w-4" />
@@ -196,7 +198,7 @@ export function ComponentDialog({
 
             <button
               onClick={onClose}
-              className="inline-flex items-center justify-center h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="inline-flex items-center justify-center h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>

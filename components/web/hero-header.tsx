@@ -5,12 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export function HeroHeader({ className }: { className?: string }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col max-w-5xl items-start gap-4 mb-10 w-full w-full",
-        className
-      )}
-    >
+    <div className={cn("flex flex-col items-start gap-4 max-w-4xl", className)}>
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1]">
         Stop browsing screenshots. <br />
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500">

@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { Suspense } from "react";
 import { HeroHeader } from "@/components/web/hero-header";
-import { HorizontalComponentList } from "@/components/web/horizontal-component-list";
+import { ComponentGrid } from "@/components/web/component-grid";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -20,23 +20,18 @@ export default async function Home() {
   }
 
   return (
-    <>
+    <div className="w-full px-8 space-y-24">
       {/* Hero Section */}
       <HeroHeader />
 
-      {/* Horizontal List Section */}
-      <div className="mb-4">
-        <Suspense
-          fallback={
-            <div className="h-64 w-full bg-muted/10 rounded-xl animate-pulse" />
-          }
-        >
-          <HorizontalComponentList
-            items={components.slice(0, 10)}
-            viewAllLink="/explore"
-          />
-        </Suspense>
-      </div>
-    </>
+      {/* Grid Section */}
+      <Suspense
+        fallback={
+          <div className="h-64 w-full bg-muted/10 rounded-xl animate-pulse" />
+        }
+      >
+        <ComponentGrid items={components.slice(0, 10)} viewAllLink="/explore" />
+      </Suspense>
+    </div>
   );
 }

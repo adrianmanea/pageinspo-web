@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { ComponentCard } from "@/components/web/component-card";
+import { ComponentGrid } from "@/components/web/component-grid";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -57,7 +57,11 @@ export default async function SourcePage({
             Browse UI patterns and flows inspired by {source.name}.
             {source.url && (
               <Link
-                href={source.url}
+                href={
+                  (source.url.startsWith("http")
+                    ? source.url
+                    : `https://${source.url}`) + "?ref=pageinspo.com"
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="ml-2 text-primary hover:underline text-sm"
@@ -77,20 +81,7 @@ export default async function SourcePage({
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {components?.map((component) => (
-            <ComponentCard
-              key={component.id}
-              item={component}
-              href={`/component/${component.id}`}
-            />
-          ))}
-          {(!components || components.length === 0) && (
-            <div className="col-span-full py-12 text-center text-muted-foreground">
-              No components found for this source yet.
-            </div>
-          )}
-        </div>
+        <ComponentGrid items={components || []} />
       </section>
     </>
   );

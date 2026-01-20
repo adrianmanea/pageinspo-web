@@ -12,7 +12,7 @@ export default function AdminLayout({
 
       <div className="flex-1 flex flex-col h-full py-2 pr-2 pl-0">
         <div className="flex-1 flex flex-col rounded-3xl border border-border bg-card overflow-hidden relative">
-          <Header className="bg-transparent border-b border-border/50 backdrop-blur-none" />
+          <Header className="bg-transparent border-b border-border/50" />
           <main className="flex-1 overflow-y-auto p-6 scrollbar-thin">
             {children}
           </main>

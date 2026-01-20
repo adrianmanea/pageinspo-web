@@ -118,8 +118,8 @@ export function Header({ className, breadcrumbs }: HeaderProps) {
 
         <div className="relative w-full max-w-sm ml-auto lg:ml-0">
           <Button
-            variant="outline"
-            className="w-full justify-start text-muted-foreground bg-muted/50 border-border hover:bg-muted h-9 rounded-full px-3 text-[13px] font-normal cursor-pointer"
+            variant="ghost"
+            className="w-full justify-start text-muted-foreground bg-muted hover:bg-accent h-9 rounded-full px-3 font-normal cursor-pointer"
             onClick={() => setIsSearchOpen(true)}
           >
             <Search className="mr-2 h-4 w-4" />
@@ -152,7 +152,7 @@ export function Header({ className, breadcrumbs }: HeaderProps) {
               <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Sign Out</span>
             </Button>
-            <Avatar className="h-8 w-8 border border-border">
+            <Avatar className="h-8 w-8">
               <div
                 className="h-full w-full flex items-center justify-center text-white text-[10px] font-bold"
                 style={{ backgroundImage: getGradient(user.email || "User") }}

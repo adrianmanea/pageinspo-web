@@ -85,7 +85,7 @@ export function PreviewFrame({
           src={previewUrl}
           className="w-full h-full border-0"
           title="Component Preview"
-          sandbox="allow-scripts"
+          sandbox="allow-scripts allow-same-origin"
           onLoad={handleIframeLoad}
         />
       </div>

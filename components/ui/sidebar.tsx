@@ -7,7 +7,6 @@ import { createClient } from "@/utils/supabase/client";
 import {
   Home,
   Layout,
-  ChevronRight,
   Smartphone,
   Component,
   GitBranch,
@@ -194,12 +193,6 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                       {label}
                     </span>
                   </div>
-                  <ChevronRight
-                    className={cn(
-                      "h-4 w-4 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
-                      isOpen && "rotate-90",
-                    )}
-                  />
                 </Button>
 
                 <AnimatePresence initial={false}>
@@ -277,7 +270,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
             <span className="text-xs font-medium text-muted-foreground">
               Theme
             </span>
-            <div className="flex items-center bg-sidebar-accent/50 rounded-lg p-0.5 border border-sidebar-border/50">
+            <div className="flex items-center bg-muted rounded-lg p-0.5 border border-muted/50">
               <button
                 onClick={() => setTheme("light")}
                 className={cn(
@@ -340,7 +333,7 @@ function NavItem({ href, icon: Icon, label, active }: NavItemProps) {
       className={cn(
         "w-full justify-start gap-2 px-3",
         active
-          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          ? "bg-sidebar-accent/50 hover:bg-sidebar-accent text-sidebar-accent-foreground"
           : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
       )}
     >
