@@ -43,6 +43,7 @@ export function ComponentTable({
             <TableHead className="w-[80px]">ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Description</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[150px]">Filters</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -63,6 +64,19 @@ export function ComponentTable({
                 <TableCell>{component.name}</TableCell>
                 <TableCell className="text-muted-foreground truncate max-w-[200px]">
                   {component.description}
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full capitalize ${
+                      component.status === "published"
+                        ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                        : component.status === "archived"
+                          ? "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
+                          : "bg-muted text-muted-foreground border border-border"
+                    }`}
+                  >
+                    {component.status || "draft"}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">

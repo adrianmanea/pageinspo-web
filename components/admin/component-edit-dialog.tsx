@@ -49,6 +49,9 @@ export function ComponentEditDialog({
   const [selectedSourceId, setSelectedSourceId] = useState<string>(
     component.source_id || "",
   );
+  const [status, setStatus] = useState<
+    "draft" | "published" | "archived" | "deleted"
+  >(component.status || "draft");
   const [isUploading, setIsUploading] = useState(false);
   const supabase = createClient();
 
@@ -194,6 +197,7 @@ export function ComponentEditDialog({
               ? selectedSourceId
               : null,
           original_app: null, // Clear legacy field
+          status,
         });
 
         // Update filters
@@ -349,6 +353,21 @@ export function ComponentEditDialog({
                     {s.name}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid gap-2">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={(val: any) => setStatus(val)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft (Admin Only)</SelectItem>
+                <SelectItem value="published">Published (Public)</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+                <SelectItem value="deleted">Deleted (Soft)</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Avatar } from "@/components/ui/avatar";
 import { getGradient } from "@/utils/get-gradient";
+import { getPublicSource, getPublicSourceComponents } from "@/utils/queries";
 
 // Dynamic to ensure fresh data
 export const dynamic = "force-dynamic";
@@ -19,30 +20,16 @@ export default async function SourcePage({
     return <div>Supabase not configured</div>;
   }
 
-  const supabase = await createClient();
-
   // Fetch Source Info
-  const { data: source, error: sourceError } = await supabase
-    .from("sources")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+  const source = await getPublicSource(slug);
 
-  if (sourceError || !source) {
-    console.error("Source not found:", sourceError);
+  if (!source) {
+    console.error("Source not found:", slug);
     notFound();
   }
 
   // Fetch Associated Components
-  const { data: components, error: compError } = await supabase
-    .from("components")
-    .select("*, sources!inner(*)")
-    .eq("source_id", source.id)
-    .order("created_at", { ascending: false });
-
-  if (compError) {
-    console.error("Error fetching components:", compError);
-  }
+  const components = await getPublicSourceComponents(source.id);
 
   return (
     <>

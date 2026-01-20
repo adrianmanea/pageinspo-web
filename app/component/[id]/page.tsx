@@ -1,5 +1,10 @@
 import { createClient } from "@/utils/supabase/server";
 import { PreviewClient } from "./preview-client";
+import {
+  getPublicComponent,
+  getPublicComponentMetadata,
+  getComponentVariants,
+} from "@/utils/queries";
 import type { Metadata } from "next";
 
 // Force dynamic to ensure we don't cache stale preview URLs
@@ -24,13 +29,7 @@ export async function generateMetadata({
     return { title: "Component Preview" };
   }
 
-  const supabase = await createClient();
-
-  const { data: component } = await supabase
-    .from("components")
-    .select("name, description, og_image_url, thumbnail_url, sources(name)")
-    .eq("id", id)
-    .single();
+  const component = await getPublicComponentMetadata(id);
 
   if (!component) {
     return { title: "Component Not Found" };
@@ -92,16 +91,9 @@ export default async function ComponentPage({
 
   try {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      const supabase = await createClient();
-      const { data: compData } = await supabase
-        .from("components")
-        .select("*, sources (name, slug, icon_url)")
-        .eq("id", id)
-        .single();
+      component = await getPublicComponent(id);
 
-      if (compData) {
-        component = compData;
-
+      if (component) {
         // Create the default variant from the main component
         const defaultVariant = {
           id: "default-main",
@@ -112,12 +104,7 @@ export default async function ComponentPage({
         };
 
         // Fetch additional variants
-        const { data: varData } = await supabase
-          .from("component_variants")
-          .select("*")
-          .eq("component_id", id)
-          .order("is_default", { ascending: false }) // Default first
-          .order("created_at", { ascending: true });
+        const varData = await getComponentVariants(id);
 
         // Combine default + additional variants
         if (varData && varData.length > 0) {

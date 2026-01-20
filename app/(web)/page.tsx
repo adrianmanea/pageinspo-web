@@ -2,22 +2,13 @@ import { createClient } from "@/utils/supabase/server";
 import { Suspense } from "react";
 import { HeroHeader } from "@/components/web/hero-header";
 import { ComponentGrid } from "@/components/web/component-grid";
+import { getPublicComponents } from "@/utils/queries";
 
 export default async function Home() {
   const supabase = await createClient();
 
   // Fetch components (ordered by created_at)
-  let components: any[] = [];
-  try {
-    const { data } = await supabase
-      .from("components")
-      .select("*, sources(name, slug)")
-      .order("created_at", { ascending: false });
-
-    if (data) components = data;
-  } catch (e) {
-    console.error("Error fetching components:", e);
-  }
+  const components = await getPublicComponents(10);
 
   return (
     <div className="w-full px-8 space-y-24">

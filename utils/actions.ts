@@ -14,6 +14,7 @@ export async function updateComponent(
     og_image_url?: string | null; // New field
     source_id?: string | null;
     original_app?: string | null;
+    status?: "draft" | "published" | "archived" | "deleted";
   },
 ) {
   const supabase = await createClient();
