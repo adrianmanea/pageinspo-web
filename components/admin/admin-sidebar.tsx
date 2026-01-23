@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/utils/cn";
-import { PlusCircle, Component, ArrowLeft, Database } from "lucide-react";
+import {
+  PlusCircle,
+  Component,
+  ArrowLeft,
+  Database,
+  LayoutDashboard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -15,7 +21,7 @@ export function AdminSidebar({ className, ...props }: AdminSidebarProps) {
     <aside
       className={cn(
         "hidden w-[260px] flex-col bg-sidebar text-sidebar-foreground lg:flex shrink-0 h-screen overflow-y-auto scrollbar-none",
-        className
+        className,
       )}
       {...props}
     >
@@ -38,16 +44,28 @@ export function AdminSidebar({ className, ...props }: AdminSidebarProps) {
         {/* Main Admin Nav */}
         <div className="space-y-0.5">
           <NavItem
+            href="/admin"
+            icon={Component} // Using Component icon for dashboard or maybe LayoutDashboard if available, but staying consistent with "All Components" icon which was Component?
+            // Wait, "All Components" uses Component icon. Dashboard can use something else or just swap.
+            // Let's check imports. Importing Component.
+            // Let's import LayoutDashboard from lucide-react.
+            label="Dashboard"
+            active={pathname === "/admin"}
+          />
+          <NavItem
             href="/admin/components"
-            icon={Component}
+            icon={Database} // Reusing Database for now or stick to Component for "All Components"?
+            // "All Components" had Component icon.
+            // "Manage Sources" had Database icon.
+            // Let's keep "All Components" as Component.
             label="All Components"
             active={pathname === "/admin/components"}
           />
           <NavItem
-            href="/admin"
+            href="/admin/create"
             icon={PlusCircle}
             label="Add New"
-            active={pathname === "/admin"}
+            active={pathname === "/admin/create"}
           />
           <NavItem
             href="/admin/sources"
@@ -94,7 +112,7 @@ function NavItem({ href, icon: Icon, label, active }: NavItemProps) {
         "w-full justify-start gap-2 px-3",
         active
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
-          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
       )}
     >
       <Link href={href}>

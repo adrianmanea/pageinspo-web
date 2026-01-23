@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,9 @@ import { FilterSelector } from "./filter-selector";
 import { updateComponent } from "@/utils/actions";
 import { Edit } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
-import { DialogDescription } from "@/components/ui/dialog";
+import { ThumbnailUpload } from "./thumbnail-upload";
+import { OgImageUpload } from "./og-image-upload";
+import { VariantManager, Variant } from "./variant-manager";
 
 interface ComponentEditDialogProps {
   component: any;
@@ -54,6 +57,34 @@ export function ComponentEditDialog({
   >(component.status || "draft");
   const [isUploading, setIsUploading] = useState(false);
   const supabase = createClient();
+
+  const [variants, setVariants] = useState<Variant[]>([]);
+
+  useEffect(() => {
+    const fetchVariants = async () => {
+      const { data } = await supabase
+        .from("component_variants")
+        .select("*")
+        .eq("component_id", component.id);
+
+      if (data) {
+        setVariants(
+          data.map((v) => ({
+            id: v.id,
+            name: v.name,
+            content: v.preview_url,
+            file: null,
+            type:
+              v.preview_url?.startsWith("http") &&
+              !v.preview_url?.includes("/storage/v1/object/public/")
+                ? "url"
+                : "code",
+          })),
+        );
+      }
+    };
+    fetchVariants();
+  }, [component.id, supabase]);
 
   useEffect(() => {
     const fetchSources = async () => {
@@ -217,6 +248,69 @@ export function ComponentEditDialog({
           );
         }
 
+        // Update Variants
+        // Strategy: Delete all existing and re-insert current state.
+
+        // 1. Process new file uploads for variants
+        const storageId = component.id;
+
+        const processedVariants = await Promise.all(
+          variants.map(async (variant) => {
+            let content = variant.content;
+
+            if (variant.file) {
+              const fileExt = variant.file.name.split(".").pop();
+              const fileName = `variants/${storageId}/${variant.id}-${Date.now()}.${fileExt}`;
+
+              const uploadOptions: any = { upsert: true };
+              if (
+                variant.type === "code" ||
+                variant.file.type === "text/html"
+              ) {
+                uploadOptions.contentType = "text/html";
+              }
+
+              const { error: uploadError } = await supabase.storage
+                .from("component-previews")
+                .upload(fileName, variant.file, uploadOptions);
+
+              if (uploadError) throw uploadError;
+
+              const { data } = supabase.storage
+                .from("component-previews")
+                .getPublicUrl(fileName);
+              content = data.publicUrl;
+            }
+
+            return {
+              ...variant,
+              finalContent: content,
+            };
+          }),
+        );
+
+        // 2. Delete existing
+        await supabase
+          .from("component_variants")
+          .delete()
+          .eq("component_id", component.id);
+
+        // 3. Insert new
+        if (processedVariants.length > 0) {
+          const variantInserts = processedVariants.map((v) => ({
+            component_id: component.id,
+            name: v.name,
+            preview_url: v.finalContent,
+            is_default: false,
+          }));
+
+          const { error: variantsError } = await supabase
+            .from("component_variants")
+            .insert(variantInserts);
+
+          if (variantsError) throw variantsError;
+        }
+
         setOpen(false);
       } catch (e) {
         console.error("Failed to update", e);
@@ -259,83 +353,18 @@ export function ComponentEditDialog({
               className="bg-background border-input"
             />
           </div>
-          <div className="grid gap-2">
-            <Label>Thumbnail</Label>
-            <div className="flex items-center gap-4">
-              <Input
-                type="file"
-                accept="image/*,video/mp4"
-                onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-                className="bg-background border-input text-xs cursor-pointer"
-              />
-              {(thumbnailFile || component.thumbnail_url) && (
-                <div className="relative h-10 w-16 flex-shrink-0 overflow-hidden rounded border border-border">
-                  {thumbnailFile ? (
-                    thumbnailFile.type.startsWith("video/") ? (
-                      <video
-                        src={URL.createObjectURL(thumbnailFile)}
-                        className="h-full w-full object-cover"
-                        itemProp="video"
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ) : (
-                      <img
-                        src={URL.createObjectURL(thumbnailFile)}
-                        alt="New thumbnail"
-                        className="h-full w-full object-cover"
-                      />
-                    )
-                  ) : component.thumbnail_url?.match(/\.(mp4|webm)$/i) ? (
-                    <video
-                      src={component.thumbnail_url}
-                      className="h-full w-full object-cover"
-                      muted
-                      loop
-                      playsInline
-                    />
-                  ) : (
-                    <img
-                      src={component.thumbnail_url}
-                      alt="Current thumbnail"
-                      className="h-full w-full object-cover"
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
 
-          <div className="grid gap-2">
-            <Label>OG Image (Social Share)</Label>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 space-y-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setOgImageFile(e.target.files?.[0] || null)}
-                  className="bg-background border-input text-xs cursor-pointer"
-                />
-                <p className="text-[10px] text-muted-foreground">
-                  Auto-generated for videos. Upload to override.
-                </p>
-              </div>
-              {(ogImageFile || component.og_image_url) && (
-                <div className="relative h-10 w-16 flex-shrink-0 overflow-hidden rounded border border-border">
-                  <img
-                    src={
-                      ogImageFile
-                        ? URL.createObjectURL(ogImageFile)
-                        : component.og_image_url
-                    }
-                    alt="OG Preview"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+          <ThumbnailUpload
+            currentThumbnailUrl={component.thumbnail_url}
+            thumbnailFile={thumbnailFile}
+            setThumbnailFile={setThumbnailFile}
+          />
+
+          <OgImageUpload
+            currentOgImageUrl={component.og_image_url}
+            ogImageFile={ogImageFile}
+            setOgImageFile={setOgImageFile}
+          />
 
           <div className="grid gap-2">
             <Label>Attribution Source</Label>
@@ -444,6 +473,8 @@ export function ComponentEditDialog({
               onChange={setSelectedFilters}
             />
           </div>
+
+          <VariantManager variants={variants} setVariants={setVariants} />
         </div>
         <div className="flex justify-end gap-3">
           <Button
