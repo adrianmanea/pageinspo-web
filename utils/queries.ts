@@ -23,7 +23,6 @@ export const getPublicSource = cache(async (slug: string) => {
     .from("sources")
     .select("*")
     .eq("slug", slug)
-    .eq("status", "published")
     .single();
 
   if (error) return null;

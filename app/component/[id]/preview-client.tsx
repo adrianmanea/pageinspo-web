@@ -4,7 +4,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Monitor, Smartphone, Tablet, Info } from "lucide-react";
+import {
+  ArrowLeft,
+  Monitor,
+  Smartphone,
+  Tablet,
+  Info,
+  Sun,
+  Moon,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 
 interface PreviewClientProps {
   component: any;
@@ -40,6 +50,24 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
   );
 
   const [mounted, setMounted] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const themeParam = searchParams.get("theme");
+  const { resolvedTheme } = useTheme();
+
+  // If no theme param, use site theme, but don't force push to URL immediately to allow clean initial load.
+  // We just pass it to PreviewFrame.
+  const effectiveTheme =
+    (themeParam as "light" | "dark") ||
+    (resolvedTheme as "light" | "dark") ||
+    "light";
+
+  const toggleTheme = () => {
+    const newTheme = effectiveTheme === "light" ? "dark" : "light";
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set("theme", newTheme);
+    router.replace(`?${newParams.toString()}`);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -149,6 +177,19 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="inline-flex items-center justify-center h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer mr-2"
+            title={`Switch to ${effectiveTheme === "light" ? "dark" : "light"} mode`}
+          >
+            {effectiveTheme === "light" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </button>
+
           {/* Device Toggles */}
           <div className="flex items-center bg-muted/50 p-1 rounded-lg border border-border/50">
             <button
@@ -223,7 +264,7 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
       </header>
 
       {/* Main Preview Area */}
-      <main className="flex-1 w-full relative bg-muted/20 flex items-center justify-center overflow-hidden p-4">
+      <main className="flex-1 w-full relative bg-muted/20 flex items-center justify-center overflow-hidden">
         <div
           className={cn(
             "relative transition-all duration-300 ease-in-out bg-background overflow-hidden",
@@ -241,7 +282,7 @@ export function PreviewClient({ component, variants }: PreviewClientProps) {
                 ? `/api/preview-proxy?url=${encodeURIComponent(currentUrl)}`
                 : null
             }
-            theme="light"
+            theme={effectiveTheme}
             componentId={component.id}
           />
         </div>

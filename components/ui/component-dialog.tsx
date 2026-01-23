@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, ExternalLink, User } from "lucide-react";
+import { X, ExternalLink, User, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Avatar } from "@/components/ui/avatar";
@@ -28,6 +29,23 @@ export function ComponentDialog({
 }: ComponentDialogProps) {
   const [variants, setVariants] = useState<any[]>([]);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const { resolvedTheme } = useTheme();
+  const [previewTheme, setPreviewTheme] = useState<"light" | "dark">("light");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Sync preview theme with site theme initially
+  useEffect(() => {
+    if (resolvedTheme) {
+      setPreviewTheme(resolvedTheme as "light" | "dark");
+    }
+  }, [resolvedTheme, isOpen]);
+
+  // Reset loading state when dialog opens or component changes
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+    }
+  }, [isOpen, component, selectedVariant, previewTheme]);
 
   useEffect(() => {
     if (isOpen && component) {
@@ -185,8 +203,22 @@ export function ComponentDialog({
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() =>
+                setPreviewTheme((prev) => (prev === "light" ? "dark" : "light"))
+              }
+              className="inline-flex items-center justify-center h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              title={`Switch to ${previewTheme === "light" ? "dark" : "light"} mode`}
+            >
+              {previewTheme === "light" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
+
             <Link
-              href={`/component/${component.id}`}
+              href={`/component/${component.id}?theme=${previewTheme}`}
               target="_blank"
               className="inline-flex items-center justify-center h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
               title="Open in new tab"
@@ -207,15 +239,21 @@ export function ComponentDialog({
 
         {/* Content (Iframe) */}
         <div className="flex-1 bg-background relative overflow-hidden">
+          {isLoading && (
+            <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center z-10 w-full h-full">
+              <div className="h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+            </div>
+          )}
           <iframe
             src={
               currentUrl
-                ? `/api/preview-proxy?url=${encodeURIComponent(currentUrl)}`
-                : `/component/${component.id}/preview`
+                ? `/api/preview-proxy?url=${encodeURIComponent(currentUrl)}&theme=${previewTheme}`
+                : `/component/${component.id}/preview?theme=${previewTheme}`
             }
             className="w-full h-full border-0"
             title="Component Preview"
             sandbox="allow-scripts allow-same-origin"
+            onLoad={() => setIsLoading(false)}
           />
         </div>
       </DialogContent>

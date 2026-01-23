@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { incrementViewCount } from "@/utils/actions";
 
 interface PreviewFrameProps {
@@ -18,6 +18,9 @@ export function PreviewFrame({
   const iframeRef = useRef(null);
   const hasTrackedView = useRef(false);
 
+  // Skeleton loading state
+  const [isLoading, setIsLoading] = useState(true);
+
   // Fallback to runtime sandbox logic (only runs if no previewUrl)
   useEffect(() => {
     if (previewUrl) return; // Skip if we are in URL mode
@@ -27,6 +30,7 @@ export function PreviewFrame({
 
     // Allow iframe to load before sending messages
     const handleLoad = () => {
+      setIsLoading(false);
       // Send theme
       iframe.contentWindow?.postMessage(
         { type: "THEME_CHANGE", payload: theme },
@@ -73,16 +77,26 @@ export function PreviewFrame({
   // If a static preview URL is provided, just use that.
   if (previewUrl) {
     const handleIframeLoad = () => {
+      setIsLoading(false);
       if (componentId && !hasTrackedView.current) {
         hasTrackedView.current = true;
         incrementViewCount(componentId).catch(console.error);
       }
     };
 
+    // Append theme to URL. Check if URL already has params.
+    const separator = previewUrl.includes("?") ? "&" : "?";
+    const urlWithTheme = `${previewUrl}${separator}theme=${theme}`;
+
     return (
-      <div className="w-full h-full bg-transparent rounded-lg shadow-sm overflow-hidden border border-gray-200/0">
+      <div className="w-full h-full bg-transparent overflow-hidden border relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center z-10">
+            <div className="h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          </div>
+        )}
         <iframe
-          src={previewUrl}
+          src={urlWithTheme}
           className="w-full h-full border-0"
           title="Component Preview"
           sandbox="allow-scripts allow-same-origin"
@@ -93,7 +107,12 @@ export function PreviewFrame({
   }
 
   return (
-    <div className="w-full h-full bg-transparent rounded-lg shadow-sm overflow-hidden border border-gray-200/0">
+    <div className="w-full h-full bg-transparent overflow-hidden border relative">
+      {isLoading && (
+        <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center z-10">
+          <div className="h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+        </div>
+      )}
       <iframe
         ref={iframeRef}
         src="/sandbox.html"

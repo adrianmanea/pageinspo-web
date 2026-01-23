@@ -52,7 +52,7 @@ export function ComponentFilterSidebar({ className }: { className?: string }) {
       setLoading(false);
     }
     fetchFilters();
-  }, []);
+  }, [supabase]);
 
   const toggleFilter = (id: string, section: string, slug: string) => {
     const newFilters = activeFilterIds.includes(id)
@@ -100,7 +100,7 @@ export function ComponentFilterSidebar({ className }: { className?: string }) {
     <div
       className={cn(
         "w-64 border-r border-border bg-card/50 flex flex-col h-[calc(100vh-64px)] overflow-hidden",
-        className
+        className,
       )}
     >
       <div className="p-4 border-b border-border flex items-center justify-between">
@@ -161,7 +161,7 @@ export function ComponentFilterSidebar({ className }: { className?: string }) {
                               "w-full text-left px-2 py-1.5 text-xs rounded transition-colors flex items-center justify-between group",
                               activeFilterIds.includes(filter.id)
                                 ? "bg-secondary text-secondary-foreground font-medium"
-                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                             )}
                           >
                             <span>{filter.name}</span>

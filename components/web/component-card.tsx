@@ -5,6 +5,7 @@ import { cn } from "@/utils/cn";
 import { Avatar } from "@/components/ui/avatar";
 import { Component, Eye } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface ComponentCardProps {
   item: {
@@ -48,10 +49,12 @@ export function ComponentCard({
                 playsInline
               />
             ) : (
-              <img
+              <Image
                 src={item.thumbnail_url}
                 alt={item.name}
-                className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                fill
+                className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                unoptimized
               />
             )
           ) : (
