@@ -44,6 +44,9 @@ function LoginContent() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${location.origin}/auth/confirm`,
+          },
         });
         if (error) throw error;
         setMessage({
